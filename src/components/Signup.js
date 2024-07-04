@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './login.css'
+import './login.css';
+
 const Signup = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -9,6 +10,7 @@ const Signup = () => {
         phone: '',
         profession: ''
     });
+    const [phoneError, setPhoneError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -16,10 +18,20 @@ const Signup = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+        if (e.target.name === 'phone') {
+            setPhoneError('');
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const phonePattern = /^\d{10}$/;
+
+        if (!phonePattern.test(formData.phone)) {
+            setPhoneError('Phone number must be exactly 10 digits.');
+            return;
+        }
+
         localStorage.setItem('user', JSON.stringify(formData));
         alert('User registered successfully!');
         navigate('/login');
@@ -43,7 +55,17 @@ const Signup = () => {
                 </label>
                 <label>
                     Phone:
-                    <input type="text" name="phone" value={formData.phone} onChange={handleChange} required />
+                    <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        pattern="\d{10}"
+                        maxLength="10"
+                        title="Phone number must be exactly 10 digits."
+                    />
+                    {phoneError && <span className="error">{phoneError}</span>}
                 </label>
                 <label>
                     Profession:
